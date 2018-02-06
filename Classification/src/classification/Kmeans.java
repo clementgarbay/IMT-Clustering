@@ -46,15 +46,10 @@ public class Kmeans {
 
         // Calcul des classes aléatoirement (non vide)
         for (int i = 0; i < this.classes.length; i++) {
-            this.classes[i] = random.nextInt(nombreClasses);
+            int classe = i % nombreClasses;
+            this.classes[i] = classe; // random.nextInt(nombreClasses);
+            tailles[classe]++;
         }
-
-        List<HashSet<Integer>> partitions = getPartition();
-
-        // Initialise les tailles à partir de la taille de chaque partition
-        IntStream.range(0, partitions.size())
-            .mapToObj(i -> toEntry(i, partitions.get(i).size()))
-            .forEach(elem -> tailles[elem.getKey()] = elem.getValue());
 
         calculBarycentres();
     }
@@ -66,22 +61,45 @@ public class Kmeans {
     }
 
     private boolean changementClasses() {
-	    return some(getPartition(), partition -> some(partition, this::affectation));
+	    //return some(IntStream.range(0, classes.length).toArray(), point -> this.affectation(point));
+
+	    boolean hasChanged = false;
+
+	    int length = classes.length;
+        for (int point = 0; point < length; point++) {
+            //System.out.println("On traite le point " + point);
+            hasChanged = this.affectation(point) || hasChanged;
+        }
+
+        return hasChanged; // some(getPartition(), partition -> some(partition, this::affectation));
     }
 	
 	private boolean affectation(int i) {
+        //System.out.println("On traite le point dans affectation " + i);
         Vecteur xI = vecteur(i);
         int classeI = classes[i];
 
-        int nouvelleClasseI = Arrays.stream(classes).boxed()
+        int nouvelleClasseI = IntStream.range(0, nombreClasses).boxed()
             .map(classe -> {
+                if (classeI == classe) {
+                    return toEntry(classe, 0.0); // System.out.println("delta -> " + delta);
+                }
+
                 double delta = deltaVariance(xI, classeI, classe);
+
                 return toEntry(classe, delta);
             }) // calcul le delta pour chaque classe
             .min(Comparator.comparingDouble(AbstractMap.SimpleEntry::getValue)) // prend le plus delta
-            .map(AbstractMap.SimpleEntry::getKey).get(); // récupère l'indice de la classe associé au plus petit delta (i.e. nouvelle classe)
+            .map(min -> (min.getValue() < 0) ? min.getKey() : classeI) // récupère la classe associé au plus petit delta (i.e. nouvelle classe) ou la même classe si delta non négatif
+            .get();
 
-        if (classeI == nouvelleClasseI) return false; // pas de changement de classe
+
+        if (classeI == nouvelleClasseI) {
+//            System.out.println("Pas de changement pour " + i + " (classe " + classeI + ")");
+            return false; // pas de changement de classe
+        }
+
+//        System.out.println("Changement pour " + i + " (classe " + classeI + " ->  " + nouvelleClasseI + ")");
 
         Vecteur baryIP = barycentreWithoutI(i);
         Vecteur baryKP = barycentreClasseWithI(i, nouvelleClasseI);
@@ -91,29 +109,32 @@ public class Kmeans {
 
         classes[i] = nouvelleClasseI; // la classe de i devient k
 
+        tailles[classeI] = tailles[classeI] - 1;
+        tailles[nouvelleClasseI] = tailles[nouvelleClasseI] + 1;
+
         return true; // il y a eu un changement de classe
 	}
 
 	// Slide 19
 	private Vecteur barycentreWithoutI(int pointI) {
 	    int classeI = classes[pointI];
-        Vecteur oldBarycentreI = this.centres[classeI]; // bary[i]
+        Vecteur oldBarycentreI = centres[classeI]; // bary[i]
         Vecteur xI = vecteur(classeI); // x[i]
-        int nI = tailles[classeI]; // n[i]
-        int coef = 1 / (nI - 1);
+        double nI = tailles[classeI]; // n[i]
+        double coef = 1f / (nI - 1f);
 
-        return oldBarycentreI.plus(oldBarycentreI.moins(xI).mult(coef));
+        return Vecteur.plus(oldBarycentreI, Vecteur.mult(Vecteur.moins(oldBarycentreI, xI), coef));
     }
 
     // Slide 19
 	private Vecteur barycentreClasseWithI(int pointI, int classeK) {
         int classeI = classes[pointI];
-		Vecteur oldBarycentreK = this.centres[classeK]; // bary[k]
+		Vecteur oldBarycentreK = centres[classeK]; // bary[k]
 	    Vecteur xI = vecteur(classeI); // x[i]
-        int nK = tailles[classeK]; // n[k]
-        int coef = 1 / (nK + 1);
+        double nK = tailles[classeK]; // n[k]
+        double coef = 1f / (nK + 1f);
 
-		return oldBarycentreK.plus(xI.moins(oldBarycentreK).mult(coef));
+        return Vecteur.plus(oldBarycentreK, Vecteur.mult(Vecteur.moins(xI, oldBarycentreK), coef));
     }
 	
 	private double deltaVariance(Vecteur v, int classeAvant, int classeApres) {
