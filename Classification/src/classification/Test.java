@@ -33,9 +33,9 @@ public class Test {
         System.out.println(inertie(nuage));*/
 
 		Image im = new Image("test","images/martine.jpg");
-		im.hmeans(8);
+		im.kmeans(3);
 		im.display();
-		im.display3D();	
+		//im.display3D();
 }
 
 	public static Matrix matrice(Vecteur[] vs){

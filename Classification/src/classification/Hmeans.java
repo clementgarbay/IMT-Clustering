@@ -1,11 +1,11 @@
 package classification;
 import java.util.*;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import Jama.Matrix;
+
+import static classification.StreamUtils.*;
 
 public class Hmeans {
 
@@ -112,22 +112,4 @@ public class Hmeans {
 		}
 		return new Vecteur(result);
 	}
-
-	// HELPERS
-
-    private <T, R> Stream<R> map(Collection<T> collection, Function<? super T, ? extends R> mapper) {
-        return collection.stream().map(mapper);
-    }
-
-    private <T> boolean some(Collection<T> collection, Function<? super T, Boolean> mapper) {
-        return map(collection, mapper).reduce(Boolean::logicalOr).get();
-    }
-
-    private static Vecteur[] toArray(Stream<Vecteur> vecteurStream) {
-        return vecteurStream.toArray(Vecteur[]::new);
-    }
-
-    private static <K,V> HashMap.SimpleEntry<K,V> toEntry(K key, V value) {
-        return new HashMap.SimpleEntry<>(key, value);
-    }
 }

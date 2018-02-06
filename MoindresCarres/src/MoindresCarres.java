@@ -19,7 +19,7 @@ import Jama.*;
 public class MoindresCarres {
 
 	/**
-	 * data = <(x_0,y_0), ..., (x_n,y_n)>
+	 * data = <(x_0,y_0), ... , (x_n,y_n)>
 	 * 
 	 * model : y = f(x) = coeff_0 + coeff_1.x + coeff_2.x^2 + ... + coeff_max.x^max
 	 * 
