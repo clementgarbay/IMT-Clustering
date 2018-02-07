@@ -33,4 +33,8 @@ class StreamUtils {
     static List<Integer> range(int from, int to) {
         return IntStream.range(from, to).boxed().collect(toList());
     }
+
+    static Optional<Double> add(Optional<Double> o1, Optional<Double> o2) {
+        return o1.map(val1 -> Optional.of(o2.map(val2 -> val1 + val2).orElse(val1))).orElse(o2);
+    }
 }

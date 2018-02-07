@@ -1,8 +1,8 @@
 package classification;
+
 import Jama.Matrix;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 public class Test {
 	public static void main(String[] args) throws IOException {
@@ -18,7 +18,7 @@ public class Test {
 		nuage[8]=new Vecteur(6,18);
 		nuage[9]=new Vecteur(17,19);
 		//Hmeans h = new Hmeans(matrice(nuage), 3);
-		Kmeans h = new Kmeans(matrice(nuage), 3);
+		// Kmeans h = new Kmeans(matrice(nuage), 3);
 		//System.out.println(h.getPartition());
 
 		/*Vecteur[] vs = new Vecteur[5];
@@ -45,16 +45,5 @@ public class Test {
 			c[i++]=v.toDouble();
 		return new Matrix(c);		
 	}
-
-    public static double inertie(Vecteur[] vecteurs) {
-        Vecteur barycentre = Vecteur.barycentre(vecteurs);
-        return Arrays.stream(vecteurs).mapToDouble(vecteur -> Vecteur.distanceCarre(vecteur, barycentre)).sum();
-    }
-
-    public static double inertie(Vecteur[] vecteurs, int[][] classes) {
-        return Arrays.stream(classes).mapToDouble(classe ->
-            inertie(Arrays.stream(classe).mapToObj(i -> vecteurs[i]).toArray(Vecteur[]::new))
-        ).sum();
-    }
 
 }

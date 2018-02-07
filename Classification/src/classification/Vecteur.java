@@ -1,10 +1,10 @@
 package classification;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
-@SuppressWarnings("unused")
 public class Vecteur {
 	public int length;
 	private double[] value;
@@ -145,4 +145,21 @@ public class Vecteur {
                 .toArray()
         );
     }
+
+	public static double inertie(Vecteur[] vecteurs) {
+		Vecteur barycentre = Vecteur.barycentre(vecteurs);
+		return Arrays.stream(vecteurs).mapToDouble(vecteur -> Vecteur.distanceCarre(vecteur, barycentre)).sum();
+	}
+
+	public static double inertie(Vecteur[] vecteurs, int[][] classes) {
+		return Arrays.stream(classes).mapToDouble(classe ->
+			inertie(Arrays.stream(classe).mapToObj(point -> vecteurs[point]).toArray(Vecteur[]::new))
+		).sum();
+	}
+
+	public static double inertie(Vecteur[] vecteurs, List<HashSet<Integer>> classes) {
+		return classes.stream().mapToDouble(classe ->
+			inertie(classe.stream().map(point -> vecteurs[point]).toArray(Vecteur[]::new))
+		).sum();
+	}
 }
