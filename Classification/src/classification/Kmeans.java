@@ -2,11 +2,10 @@ package classification;
 
 import Jama.Matrix;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Random;
+import java.util.*;
+import java.util.stream.IntStream;
 
-import static classification.StreamUtils.toArray;
+import static classification.StreamUtils.*;
 
 public class Kmeans {
 
@@ -45,8 +44,8 @@ public class Kmeans {
 
         // Calcul des classes aléatoirement (non vide)
         for (int i = 0; i < this.classes.length; i++) {
-            int classe = i % nombreClasses;
-            this.classes[i] = classe; // random.nextInt(nombreClasses);
+            int classe = random.nextInt(nombreClasses); // i % nombreClasses;
+            this.classes[i] = classe;
             tailles[classe]++;
         }
 
@@ -60,40 +59,16 @@ public class Kmeans {
     }
 
     private boolean changementClasses() {
-	    //return some(IntStream.range(0, classes.length).toArray(), point -> this.affectation(point));
-
-	    boolean hasChanged = false;
-
-	    int length = classes.length;
-        for (int point = 0; point < length; point++) {
-            //System.out.println("On traite le point " + point);
-            hasChanged = this.affectation(point) || hasChanged;
-        }
-
-        return hasChanged; // some(getPartition(), partition -> some(partition, this::affectation));
+	    return some(range(0, classes.length), this::affectation);
     }
 	
 	private boolean affectation(int i) {
-        //System.out.println("On traite le point dans affectation " + i);
         Vecteur xI = vecteur(i);
         int classeI = classes[i];
 
-        double delta = 0;
-        int nouvelleClasseI = classeI;
-
-        for (int classe = 0; classe < nombreClasses; classe++) {
-            double nouveauDelta = deltaVariance(xI, classeI, classe);
-            if (nouveauDelta < delta) {
-                delta = nouveauDelta;
-                nouvelleClasseI = classe;
-            }
-        }
-
-        /*int nouvelleClasseI = IntStream.range(0, nombreClasses).boxed()
+        int nouvelleClasseI = IntStream.range(0, nombreClasses).boxed()
             .map(classe -> {
-                if (classeI == classe) {
-                    return toEntry(classe, 0.0); // System.out.println("delta -> " + delta);
-                }
+                if (classeI == classe) return toEntry(classe, 0.0);
 
                 double delta = deltaVariance(xI, classeI, classe);
 
@@ -102,14 +77,8 @@ public class Kmeans {
             .min(Comparator.comparingDouble(AbstractMap.SimpleEntry::getValue)) // prend le plus delta
             .map(min -> (min.getValue() < 0) ? min.getKey() : classeI) // récupère la classe associé au plus petit delta (i.e. nouvelle classe) ou la même classe si delta non négatif
             .get();
-        */
 
-        if (delta >= 0 && classeI == nouvelleClasseI) {
-//            System.out.println("Pas de changement pour " + i + " (classe " + classeI + ")");
-            return false; // pas de changement de classe
-        }
-
-//        System.out.println("Changement pour " + i + " (classe " + classeI + " ->  " + nouvelleClasseI + ")");
+        if (classeI == nouvelleClasseI) return false; // pas de changement de classe
 
         Vecteur baryIP = barycentreWithoutI(i);
         Vecteur baryKP = barycentreClasseWithI(i, nouvelleClasseI);
@@ -129,7 +98,7 @@ public class Kmeans {
 	private Vecteur barycentreWithoutI(int pointI) {
 	    int classeI = classes[pointI];
         Vecteur oldBarycentreI = centres[classeI]; // bary[i]
-        Vecteur xI = vecteur(classeI); // x[i]
+        Vecteur xI = vecteur(pointI); // x[i]
         double nI = tailles[classeI]; // n[i]
         double coef = 1. / (nI - 1.);
 
@@ -138,9 +107,8 @@ public class Kmeans {
 
     // Slide 19
 	private Vecteur barycentreClasseWithI(int pointI, int classeK) {
-        int classeI = classes[pointI];
 		Vecteur oldBarycentreK = centres[classeK]; // bary[k]
-	    Vecteur xI = vecteur(classeI); // x[i]
+	    Vecteur xI = vecteur(pointI); // x[i]
         double nK = tailles[classeK]; // n[k]
         double coef = 1. / (nK + 1.);
 
