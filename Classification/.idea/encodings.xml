@@ -3,6 +3,7 @@
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/src/classification/Kmeans.java" charset="ISO-8859-1" />
     <file url="file://$PROJECT_DIR$/src/classification/Vecteur.java" charset="ISO-8859-1" />
+    <file url="file://$PROJECT_DIR$/src/main/java/classification/Image.java" charset="ISO-8859-1" />
     <file url="PROJECT" charset="UTF-8" />
   </component>
 </project>

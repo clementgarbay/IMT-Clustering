@@ -46,7 +46,7 @@ public class Kmeans {
             changementClasses()
                 .map(delta -> this.totalVariances += delta)
                 .isPresent()
-        );
+        ) ;
 
         System.out.println("Intertie finale : " + (inertieInitiale + this.totalVariances));
     }
@@ -54,7 +54,7 @@ public class Kmeans {
     private void initialise() {
         final Random random = new Random();
 
-        // Calcul des classes aléatoirement (non vide)
+        // Calcul des classes alÃ©atoirement (non vide)
         for (int i = 0; i < this.classes.length; i++) {
             int classe = random.nextInt(nombreClasses); // i % nombreClasses;
             this.classes[i] = classe;
@@ -66,8 +66,8 @@ public class Kmeans {
 
     private void calculBarycentres() {
         this.centres = toArray(getPartition().stream()
-            .map(partition -> partition.stream().map(this::vecteur))
-            .map(partitionVecteurs -> Vecteur.barycentre(toArray(partitionVecteurs))));
+                .map(partition -> partition.stream().map(this::vecteur))
+                .map(partitionVecteurs -> Vecteur.barycentre(toArray(partitionVecteurs))));
     }
 
 //    private boolean changementClasses() {
@@ -75,9 +75,9 @@ public class Kmeans {
 //    }
 
     /**
-     * Pour chaque points, effectue les changements de classe si nécessaire.
+     * Pour chaque points, effectue les changements de classe si nÃ©cessaire.
      *
-     * @return  La somme des delta variance locaux de chaque changement, ou rien si aucun changement n'a été effectué
+     * @return La somme des delta variance locaux de chaque changement, ou rien si aucun changement n'a Ã©tÃ© effectuÃ©
      */
     private Optional<Double> changementClasses() {
         return range(0, classes.length).stream()
@@ -86,23 +86,23 @@ public class Kmeans {
     }
 
     /**
-     * Affectue une nouvelle affectation de classe à un point si nécessaire.
+     * Affectue une nouvelle affectation de classe Ã  un point si nÃ©cessaire.
      *
-     * @param i L'indice du point concerné
-     * @return  La valeur du delta variance qui a permis de choisir la nouvelle classe, ou rien si aucun changement n'a été effectué
+     * @param i L'indice du point concernÃ©
+     * @return La valeur du delta variance qui a permis de choisir la nouvelle classe, ou rien si aucun changement n'a Ã©tÃ© effectuÃ©
      */
     private Optional<Double> affectation(int i) {
         Vecteur xI = vecteur(i);
         int classeI = classes[i];
 
         SimpleEntry<Integer, Double> nouvelleClasseEtDelta = IntStream.range(0, nombreClasses).boxed()
-            .map(classe -> {
-                if (classeI == classe) return toEntry(classe, 0.0);
-                return toEntry(classe, deltaVariance(xI, classeI, classe));
-            }) // calcul le delta pour chaque classe
-            .min(Comparator.comparingDouble(AbstractMap.SimpleEntry::getValue)) // prend le plus delta
-            .map(min -> (min.getValue() < 0) ? min : toEntry(classeI, 0.0)) // récupère la classe associé au plus petit delta (i.e. nouvelle classe) ou la même classe si delta non négatif
-            .get();
+                .map(classe -> {
+                    if (classeI == classe) return toEntry(classe, 0.0);
+                    return toEntry(classe, deltaVariance(xI, classeI, classe));
+                }) // calcul le delta pour chaque classe
+                .min(Comparator.comparingDouble(AbstractMap.SimpleEntry::getValue)) // prend le plus delta
+                .map(min -> (min.getValue() < 0) ? min : toEntry(classeI, 0.0)) // rï¿½cupï¿½re la classe associï¿½ au plus petit delta (i.e. nouvelle classe) ou la mï¿½me classe si delta non nï¿½gatif
+                .get();
 
         int nouvelleClasseI = nouvelleClasseEtDelta.getKey();
         double delta = nouvelleClasseEtDelta.getValue();
@@ -145,61 +145,65 @@ public class Kmeans {
     }
 
     private double deltaVariance(Vecteur v, int classeAvant, int classeApres) {
-        return (double)(tailles[classeApres])/(double)(tailles[classeApres]+1)*Vecteur.distanceCarre(centres[classeApres], v)
-                - (double)tailles[classeAvant]/(double)(tailles[classeAvant]-1)*Vecteur.distanceCarre(centres[classeAvant], v);
+        return (double) (tailles[classeApres]) / (double) (tailles[classeApres] + 1) * Vecteur.distanceCarre(centres[classeApres], v)
+                - (double) tailles[classeAvant] / (double) (tailles[classeAvant] - 1) * Vecteur.distanceCarre(centres[classeAvant], v);
     }
 
     private double ajoutVariance(Vecteur v, int classe) {
-        return (double)tailles[classe]/(double)(tailles[classe]+1)*Vecteur.distanceCarre(centres[classe], v);
+        return (double) tailles[classe] / (double) (tailles[classe] + 1) * Vecteur.distanceCarre(centres[classe], v);
     }
 
     private void initialiseCentres() {
-		/* A compléter */
-        for(int i = 0; i< nombreClasses; i++){
+        /* A complï¿½ter */
+        for (int i = 0; i < nombreClasses; i++) {
             int n;
-            do{n = (int)(Math.random()* nombreVecteurs);}
-            while(estCentre(n));
+            do {
+                n = (int) (Math.random() * nombreVecteurs);
+            }
+            while (estCentre(n));
             centres[i] = vecteur(n);
         }
     }
 
     private void calculCentres() {
-		/* A compléter */
+		/* A complï¿½ter */
         centres = new Vecteur[nombreClasses];
-        for(int i = 0; i< nombreClasses; i++){
-            centres[i]=new Vecteur(dimension);
+        for (int i = 0; i < nombreClasses; i++) {
+            centres[i] = new Vecteur(dimension);
         }
         int[] nb = new int[nombreClasses];
-        for(int i = 0; i< nombreVecteurs; i++){
+        for (int i = 0; i < nombreVecteurs; i++) {
             centres[classes[i]].plus(vecteur(i));
             nb[classes[i]]++;
         }
-        for(int i = 0; i< nombreClasses; i++){
-            if(nb[classes[i]]==0) throw new Error("Cas dégénéré : classe "+i+" vide.");
+        for (int i = 0; i < nombreClasses; i++) {
+            if (nb[classes[i]] == 0) throw new Error("Cas dÃ©gÃ©nÃ©rÃ© : classe " + i + " vide.");
             centres[i].div(nb[i]);
         }
     }
 
-    public int[] getClasses(){ return this.classes; }
+    public int[] getClasses() {
+        return this.classes;
+    }
 
-    public boolean estCentre(int n){
+    public boolean estCentre(int n) {
         Vecteur vect = vecteur(n);
-        for(int i = 0; i< nombreClasses; i++){
-            if(vect.equals(centres[i])) return true;
+        for (int i = 0; i < nombreClasses; i++) {
+            if (vect.equals(centres[i])) return true;
         }
         return false;
     }
 
 
-    public int[] getCouleurClasse(int k){
+    public int[] getCouleurClasse(int k) {
         int[] res = new int[dimension];
-        for(int i = 0; i < dimension; i++){
-            res[i] = (int)centres[k].get(i);
+        for (int i = 0; i < dimension; i++) {
+            res[i] = (int) centres[k].get(i);
         }
         return res;
     }
 
-    public Vecteur vecteur(int n){
+    public Vecteur vecteur(int n) {
         double[] result = new double[dimension];
         for (int i = 0; i < dimension; i++) {
             result[i] = donnees.get(n, i);
@@ -208,13 +212,13 @@ public class Kmeans {
     }
 
 
-    private int centreLePlusProche(Vecteur vecteur){
-		/* A compléter */
+    private int centreLePlusProche(Vecteur vecteur) {
+		/* A complï¿½ter */
         int nbCentre = centres.length;
         int classe = 0;
         double min = Vecteur.distance(vecteur, centres[0]);
-        for(int i=1;i<nbCentre;i++){
-            if(Vecteur.distance(vecteur, centres[i])<min){
+        for (int i = 1; i < nbCentre; i++) {
+            if (Vecteur.distance(vecteur, centres[i]) < min) {
                 classe = i;
                 min = Vecteur.distance(vecteur, centres[i]);
             }
@@ -222,10 +226,10 @@ public class Kmeans {
         return classe;
     }
 
-    public ArrayList<HashSet<Integer>> getPartition(){
+    public ArrayList<HashSet<Integer>> getPartition() {
         ArrayList<HashSet<Integer>> r = new ArrayList<>();
-        for(int i = 0; i< nombreClasses; i++) r.add(new HashSet<>());
-        for(int i=0;i<classes.length;i++){
+        for (int i = 0; i < nombreClasses; i++) r.add(new HashSet<>());
+        for (int i = 0; i < classes.length; i++) {
             r.get(classes[i]).add(i);
         }
         return r;

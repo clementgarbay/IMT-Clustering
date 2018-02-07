@@ -26,7 +26,7 @@ class StreamUtils {
         return vecteurStream.toArray(Vecteur[]::new);
     }
 
-    static <K,V> HashMap.SimpleEntry<K,V> toEntry(K key, V value) {
+    static <K, V> HashMap.SimpleEntry<K, V> toEntry(K key, V value) {
         return new HashMap.SimpleEntry<>(key, value);
     }
 

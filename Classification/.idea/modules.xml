@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/TP classification.iml" filepath="$PROJECT_DIR$/TP classification.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Classification.iml" filepath="$PROJECT_DIR$/.idea/modules/Classification.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Classification_main.iml" filepath="$PROJECT_DIR$/.idea/modules/Classification_main.iml" group="Classification" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Classification_test.iml" filepath="$PROJECT_DIR$/.idea/modules/Classification_test.iml" group="Classification" />
     </modules>
   </component>
 </project>
