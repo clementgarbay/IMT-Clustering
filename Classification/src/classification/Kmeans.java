@@ -1,13 +1,12 @@
 package classification;
 
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
+import Jama.Matrix;
 
-import Jama.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Random;
 
-import static classification.StreamUtils.*;
+import static classification.StreamUtils.toArray;
 
 public class Kmeans {
 
@@ -79,7 +78,18 @@ public class Kmeans {
         Vecteur xI = vecteur(i);
         int classeI = classes[i];
 
-        int nouvelleClasseI = IntStream.range(0, nombreClasses).boxed()
+        double delta = 0;
+        int nouvelleClasseI = classeI;
+
+        for (int classe = 0; classe < nombreClasses; classe++) {
+            double nouveauDelta = deltaVariance(xI, classeI, classe);
+            if (nouveauDelta < delta) {
+                delta = nouveauDelta;
+                nouvelleClasseI = classe;
+            }
+        }
+
+        /*int nouvelleClasseI = IntStream.range(0, nombreClasses).boxed()
             .map(classe -> {
                 if (classeI == classe) {
                     return toEntry(classe, 0.0); // System.out.println("delta -> " + delta);
@@ -92,9 +102,9 @@ public class Kmeans {
             .min(Comparator.comparingDouble(AbstractMap.SimpleEntry::getValue)) // prend le plus delta
             .map(min -> (min.getValue() < 0) ? min.getKey() : classeI) // récupère la classe associé au plus petit delta (i.e. nouvelle classe) ou la même classe si delta non négatif
             .get();
+        */
 
-
-        if (classeI == nouvelleClasseI) {
+        if (delta >= 0 && classeI == nouvelleClasseI) {
 //            System.out.println("Pas de changement pour " + i + " (classe " + classeI + ")");
             return false; // pas de changement de classe
         }
@@ -121,7 +131,7 @@ public class Kmeans {
         Vecteur oldBarycentreI = centres[classeI]; // bary[i]
         Vecteur xI = vecteur(classeI); // x[i]
         double nI = tailles[classeI]; // n[i]
-        double coef = 1f / (nI - 1f);
+        double coef = 1. / (nI - 1.);
 
         return Vecteur.plus(oldBarycentreI, Vecteur.mult(Vecteur.moins(oldBarycentreI, xI), coef));
     }
@@ -132,7 +142,7 @@ public class Kmeans {
 		Vecteur oldBarycentreK = centres[classeK]; // bary[k]
 	    Vecteur xI = vecteur(classeI); // x[i]
         double nK = tailles[classeK]; // n[k]
-        double coef = 1f / (nK + 1f);
+        double coef = 1. / (nK + 1.);
 
         return Vecteur.plus(oldBarycentreK, Vecteur.mult(Vecteur.moins(xI, oldBarycentreK), coef));
     }

@@ -1,9 +1,8 @@
 package classification;
+import Jama.Matrix;
+
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.stream.IntStream;
-
-import Jama.Matrix;
 
 public class Test {
 	public static void main(String[] args) throws IOException {
@@ -20,7 +19,7 @@ public class Test {
 		nuage[9]=new Vecteur(17,19);
 		//Hmeans h = new Hmeans(matrice(nuage), 3);
 		Kmeans h = new Kmeans(matrice(nuage), 3);
-		//System.out.println(h.getPartition());
+		System.out.println(h.getPartition());
 
 		/*Vecteur[] vs = new Vecteur[5];
 		vs[0]=new Vecteur(4,9);
@@ -33,9 +32,9 @@ public class Test {
 
         System.out.println(inertie(nuage));*/
 
-		Image im = new Image("test","images/martine.jpg");
+		/*Image im = new Image("test","images/martine.jpg");
 		im.kmeans(2);
-		im.display();
+		im.display();*/
 		//im.display3D();
 }
 
